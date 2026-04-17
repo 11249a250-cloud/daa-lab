@@ -1,1 +1,86 @@
+C PRORAM:
+#include <stdio.h>
 
+#define MAX_ITEMS 100
+#define BIN_CAPACITY 10 // You can change this as needed
+
+// First Fit Algorithm
+int firstFit(int weights[], int n) {
+int binCount = 0;
+int binRemaining[MAX_ITEMS];
+
+for (int i = 0; i < n; i++) {
+    int j;
+    for (j = 0; j < binCount; j++) {
+        if (binRemaining[j] >= weights[i]) {
+            binRemaining[j] -= weights[i];
+            break;
+        }
+    }
+    if (j == binCount) {
+        binRemaining[binCount] = BIN_CAPACITY - weights[i];
+        binCount++;
+    }
+}
+return binCount;
+}
+
+// Best Fit Algorithm
+int bestFit(int weights[], int n) {
+int binCount = 0;
+int binRemaining[MAX_ITEMS];
+
+for (int i = 0; i < n; i++) {
+    int bestIndex = -1;
+    int minSpaceLeft = BIN_CAPACITY + 1;
+
+    for (int j = 0; j < binCount; j++) {
+        if (binRemaining[j] >= weights[i] && 
+            binRemaining[j] - weights[i] < minSpaceLeft) {
+            bestIndex = j;
+            minSpaceLeft = binRemaining[j] - weights[i];
+        }
+    }
+
+    if (bestIndex != -1) {
+        binRemaining[bestIndex] -= weights[i];
+    } else {
+        binRemaining[binCount] = BIN_CAPACITY - weights[i];
+        binCount++;
+    }
+}
+return binCount;
+}
+
+int main() {
+int n, weights[MAX_ITEMS];
+
+printf("Enter number of items: ");
+scanf("%d", &n);
+
+printf("Enter weights of items: ");
+for (int i = 0; i < n; i++) {
+    scanf("%d", &weights[i]);
+}
+
+int binsFirstFit = firstFit(weights, n);
+int binsBestFit = bestFit(weights, n);
+
+printf("\nFirst Fit requires %d bins.\n", binsFirstFit);
+printf("Best Fit requires %d bins.\n", binsBestFit);
+
+return 0;
+}
+OUTPUT:
+Enter number of items: 8
+Enter weights of items: 2
+7
+9
+1
+3
+5
+6
+7
+
+First Fit requires 5 bins.
+Best Fit requires 5 bins.
