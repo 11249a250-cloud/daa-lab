@@ -1,1 +1,72 @@
+C PRORAM:
+#include <stdio.h>
+#include <limits.h>
 
+#define MAXN 10
+#define INF 1000000 // Define a large value for infinity
+
+int N;
+int dist[MAXN][MAXN];
+int dp[MAXN][1 << MAXN]; // DP table: dp[i][mask]
+
+int min(int a, int b) {
+return (a < b) ? a : b;
+}
+
+int tsp(int start_node) {
+// Initialize the DP table with infinity
+for (int i = 0; i < N; i++) {
+for (int j = 0; j < (1 << N); j++) {
+dp[i][j] = INF;
+}
+}
+
+dp[start_node][1 << start_node] = 0;
+for (int mask = 1; mask < (1 << N); mask++) {
+    for (int current_node = 0; current_node < N; current_node++) {
+        if (!(mask & (1 << current_node))) {
+            continue;
+        }
+
+        for (int prev_node = 0; prev_node < N; prev_node++) {
+            if (current_node == prev_node || !(mask & (1 << prev_node))) {
+                continue;
+            }
+
+            int cost = dist[prev_node][current_node];
+
+            dp[current_node][mask] = min(dp[current_node][mask], dp[prev_node][mask ^ (1 << current_node)] + cost);
+        }
+    }
+}
+int min_cost = INF;
+for (int i = 0; i < N; i++) {
+    if (i != start_node) {
+        int cost = dist[i][start_node];
+        min_cost = min(min_cost, dp[i][(1 << N) - 1] + cost);
+    }
+}
+
+return min_cost;
+}
+
+int main() {
+scanf("%d", &N);
+for (int i = 0; i < N; i++) {
+for (int j = 0; j < N; j++) {
+scanf("%d", &dist[i][j]);
+}
+}
+int result = tsp(0);
+printf("%d\n", result);
+
+return 0;
+}
+INPUT:
+4
+0 10 15 20
+10 0 35 25
+15 35 0 30
+20 25 30 0
+OUTPUT:
+80
